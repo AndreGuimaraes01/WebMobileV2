@@ -54,12 +54,85 @@ app/
 ├── plano/page.tsx          # Plano cartesiano
 ├── como-funciona/page.tsx  # Como Funciona
 └── api/alertas/            # API de alertas
-components/                 # componentes de interface
+components/
+├── BottomNav.tsx           # navegação inferior
+├── StatusLocalizacao.tsx   # cartão de status da localização
+├── BotoesReportar.tsx      # botões de tipo com contador
+├── FormularioAlerta.tsx    # formulário de novo alerta
+├── ListaAlertas.tsx        # filtro, lista e total da região
+├── CardAlerta.tsx          # um alerta da lista
+├── FormularioLocalizacao.tsx
+├── PlanoCartesiano.tsx     # canvas
+└── Legenda.tsx
 context/                    # AlertasProvider e LocalizacaoProvider
 hooks/                      # useAlertas e useLocalizacao
 lib/                        # tipos, cálculo de distância, leitura do JSON
 data/alertas.json           # alertas de exemplo
 ```
+
+## Da interface atual para os componentes
+
+A versão 2.0 era feita em HTML, CSS e JavaScript puro. As tabelas abaixo mostram onde cada parte da interface antiga foi parar no Next.js. Os seletores (`#id` e `.classe`) são os do HTML antigo.
+
+### Em todas as telas
+
+| Interface atual | Script atual | Componente novo |
+| --- | --- | --- |
+| `<main id="app-container">` e `<header><h1>` | | `app/layout.tsx` (o `<h1>` fica em cada `page.tsx`) |
+| `<nav id="bottom-nav">`, `.nav-item` e `.active` | | `BottomNav` (`<Link>` + `usePathname()`, com `aria-current="page"` no link ativo) |
+| Alertas no `localStorage` e eventos `alertAdded` | `storage.js` | `AlertasProvider` + `useAlertas()` |
+| Localização do usuário e eventos `locationUpdated` | `geo.js` | `LocalizacaoProvider` + `useLocalizacao()` |
+
+### Reportar (`index.html` → `app/page.tsx`)
+
+| Interface atual | Script atual | Componente novo |
+| --- | --- | --- |
+| `aside#statusCard` (`.status-title`, `.status-subtitle`) | `reportar.js` → `updateLocationStatus()` | `StatusLocalizacao` |
+| `#btn-water`, `#btn-trash` e o selo `data-count` | `alerts-counter.js` → `AlertsCounter` | `BotoesReportar` (recebe `onEscolher(tipo)`) |
+| `form#report-form`: `legend#form-title`, `textarea#descricao`, `select#gravidade`, `input#foto`, `#btn-cancel` | `reportar.js` → `openForm()`, `closeForm()`, `submit` | `FormularioAlerta` (o `input#alert-type` oculto vira a prop `tipo`) |
+| `output#report-status` | `reportar.js` → `showMessage()` | Estado `mensagem` em `app/page.tsx`, exibido num `<output aria-live="polite">` |
+| `article.user-summary` (`#userReportCount`) | `reportar.js` → `updateUserReports()` | `app/page.tsx`, usando `meusHoje()` de `useAlertas()` |
+
+Como guarda estado (tipo escolhido e mensagem), `app/page.tsx` é um Client Component.
+
+### Ver Bairro (`feed.html` → `app/bairro/page.tsx`)
+
+| Interface atual | Script atual | Componente novo |
+| --- | --- | --- |
+| `header.feed-header` (`.feed-subtitle`) | | Texto fixo em `app/bairro/page.tsx` |
+| `form.filter-bar` (`select#filtro-tipo`) | `feed.js` → listener de `change` | `ListaAlertas` (estado `filtro`) |
+| `ul#alert-list` e `li.alert-empty` | `feed.js` → `renderAlerts()`, `mostrarMensagem()` | `ListaAlertas` |
+| `li.alert-card` (`.alert-icon`, `.badge`, `<time>`, `<details>`) | `feed.js` → `criarCard()` com `innerHTML` | `CardAlerta` (o JSX escapa o texto, então o `innerHTML` deixa de existir) |
+| `footer.feed-summary` (`#alertCount`) | `feed.js` → `renderAlerts()` | `ListaAlertas` |
+
+### Plano (`mapa.html` → `app/plano/page.tsx`)
+
+| Interface atual | Script atual | Componente novo |
+| --- | --- | --- |
+| `form#locationForm` (`#latitude`, `#longitude`, `#btnGps`) e `output#locationStatus` (`.manual`, `.gps`) | `mapa.js` → `updateStatus()`, `submit`, clique no GPS | `FormularioLocalizacao` |
+| `canvas#mapCanvas` e `p#alertCount.map-info` | `cartesiano.js` → `CartesianPlane` | `PlanoCartesiano` (`useRef` no canvas, `ResizeObserver` no lugar de `window.resize`) |
+| `ul.legend` (`.legend-dot`, `.dot-you`, `.dot-water`, `.dot-trash`, `.dot-urgent`) | | `Legenda` (usa as mesmas cores `CORES` do canvas) |
+| `plano.html` (cópia antiga desta tela) | | Removido |
+
+### Como Funciona (`como-funciona.html` → `app/como-funciona/page.tsx`)
+
+Esta tela é um Server Component sem estado, e os estilos do `<style>` e dos atributos `style` foram para `como-funciona.module.css`.
+
+| Interface atual | Componente novo |
+| --- | --- |
+| `.info-card` | `<article>` |
+| `ol.step-list` e `.step-item` | Mantidos (`<ol>` e `<li>`) |
+| `div.info-card` de categorias e `div.badge-grid` com `div.badge-card` | `<section>` com `<ul>` e `<li>` |
+| `div.faq-section` e `div.faq-item` com `<details>` | `<section>` com `<details>` |
+| `article.tech-info` | Mantido, com o texto técnico atualizado para Next.js, React e TypeScript |
+
+### Correções feitas na migração
+
+- O link "Reportar" da navegação tinha um `</a>` a mais.
+- A gravidade aparecia como "Grave" no formulário e "Urgente" no feed. Agora é "Urgente" nos dois.
+- Os rótulos da navegação ficaram iguais em todas as telas.
+- O viewport deixou de bloquear o zoom (`user-scalable=no`).
+- As 12 `<div>` da tela Como Funciona foram trocadas por tags semânticas.
 
 ## API
 
