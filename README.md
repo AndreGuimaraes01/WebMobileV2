@@ -25,13 +25,15 @@ Projeto acadêmico da disciplina de Desenvolvimento Web Mobile, na Universidade 
 Pré-requisitos: Node.js 20.9 ou superior.
 
 ```bash
-git clone https://github.com/<usuario>/Projeto_WebMobile.git
-cd Projeto_WebMobile
+git clone https://github.com/AndreGuimaraes01/WebMobileV2.git
+cd WebMobileV2
 npm install
 npm run dev
 ```
 
 Acesse [http://localhost:3000](http://localhost:3000).
+
+> Sem Node.js na máquina? Abra o repositório no GitHub Codespaces (**Code › Codespaces › Create codespace**), rode `npm install` e `npm run dev` no terminal dele e abra o link da porta 3000 que ele mostrar.
 
 > O navegador só libera o GPS em `localhost` ou em HTTPS. Para testar em outra máquina sem HTTPS, use a localização manual na tela **Plano** (ex.: `-23.5505` e `-46.6333`).
 
@@ -52,8 +54,8 @@ app/
 ├── globals.css             # tokens, reset e classes compartilhadas
 ├── page.tsx                # Reportar (/)
 ├── bairro/page.tsx         # Ver Bairro
-├── plano/page.tsx          # Plano cartesiano
-├── como-funciona/page.tsx  # Como Funciona
+├── plano/page.tsx          # Plano cartesiano (+ plano.module.css)
+├── como-funciona/page.tsx  # Como Funciona (+ como-funciona.module.css)
 └── api/alertas/
     ├── route.ts            # GET /api/alertas
     └── [id]/route.ts       # GET /api/alertas/:id
@@ -68,7 +70,7 @@ components/                 # cada componente tem o seu .module.css
 ├── PlanoCartesiano.tsx     # canvas
 └── Legenda.tsx
 context/                    # AlertasProvider e LocalizacaoProvider
-hooks/                      # useAlertas e useLocalizacao
+hooks/                      # useAlertas, useLocalizacao e useAgora (hora para o "Há X min")
 lib/
 ├── tipos.ts                # Alerta, Localizacao, TipoAlerta, Gravidade
 ├── rotulos.ts              # cores, títulos, ícones e rótulos de gravidade
@@ -249,7 +251,7 @@ flowchart TB
 | Legenda de cores | `components/Legenda.tsx` | `Legenda.module.css` |
 | Rodapé escuro | `app/como-funciona/page.tsx` | `#app-container > footer` em `globals.css` |
 
-Cores, espaçamentos, fontes e os dois breakpoints (768px e 480px) ficam em `app/globals.css`, nas variáveis `:root`. Mudar `--primary` lá troca a cor do cabeçalho, dos botões e da aba ativa de uma vez.
+Cores, espaçamentos e fontes ficam em `app/globals.css`, nas variáveis `:root`. Mudar `--primary` lá troca a cor do cabeçalho, dos botões e da aba ativa de uma vez. Os dois breakpoints (768px e 480px) são os mesmos em todos os arquivos: abaixo de 480px o `:root` diminui fontes e espaçamentos, e cada `.module.css` ajusta o próprio componente nos mesmos tamanhos.
 
 ## Da interface atual para os componentes
 
@@ -316,6 +318,153 @@ Esta tela é um Server Component sem estado, e os estilos do `<style>` e dos atr
 - As 12 `<div>` da tela Como Funciona foram trocadas por tags semânticas.
 - O arquivo `plano.html` foi removido.
 - Os dados salvos pela versão 2.0 continuam valendo: alertas com `mine: true` viram `origem: 'local'`, e os dois alertas de exemplo antigos são ignorados porque agora vêm da API.
+
+## Cliente e servidor
+
+### Qual é o papel do servidor
+
+O servidor do Next.js faz três coisas:
+
+1. **Monta o HTML das telas.** Toda página sai do servidor já com o cabeçalho, a navegação e os textos fixos. As telas sem estado (Como Funciona, por exemplo) são montadas inteiras lá.
+2. **Serve a API de alertas.** As rotas em `app/api/alertas/` leem `data/alertas.json` (por meio de `lib/alertas-servidor.ts`) e respondem em JSON. O filtro por tipo, o cálculo de distância e a ordenação da busca por proximidade também acontecem no servidor.
+3. **Guarda o JSON longe do navegador.** `lib/alertas-servidor.ts` começa com `import 'server-only'`, então o build falha se algum componente do cliente tentar importar o arquivo. O navegador só chega aos dados pela API.
+
+O que o servidor **não** faz:
+
+- Não grava alertas novos. O que o usuário envia fica no `localStorage` do navegador dele.
+- Não sabe a localização do usuário. O GPS e a localização manual ficam no navegador.
+- Não tem banco de dados nem login.
+
+### O que roda no cliente e o que roda no servidor
+
+No App Router, todo componente é **Server Component** por padrão. Um arquivo com `'use client'` no topo vira **Client Component**, e os componentes que ele importa também vão para o navegador.
+
+| Arquivo | Onde roda | Por quê |
+| --- | --- | --- |
+| `app/layout.tsx` | Servidor | Só monta a moldura (`html`, `body`, `main`) e envolve tudo com os providers |
+| `app/page.tsx` (Reportar) | Cliente | Guarda estado: tipo escolhido e mensagem de erro ou sucesso |
+| `app/bairro/page.tsx` | Servidor | Só tem o título e o texto fixo; a lista é o `ListaAlertas` |
+| `app/plano/page.tsx` | Servidor | Só tem títulos e textos; o interativo fica nos componentes |
+| `app/como-funciona/page.tsx` | Servidor | Conteúdo fixo, sem estado nem eventos |
+| `app/api/alertas/route.ts` | Servidor | Rota da API (Route Handler) |
+| `app/api/alertas/[id]/route.ts` | Servidor | Rota da API (Route Handler) |
+| `lib/alertas-servidor.ts` | Servidor | Lê o JSON; marcado com `server-only` |
+| `context/AlertasProvider.tsx` | Cliente | Faz o `fetch` da API e lê o `localStorage` |
+| `context/LocalizacaoProvider.tsx` | Cliente | Usa o GPS (`navigator.geolocation`) e o `localStorage` |
+| `components/BottomNav.tsx` | Cliente | Usa `usePathname()` para marcar a aba ativa |
+| `components/StatusLocalizacao.tsx` | Cliente | Lê a localização pelo `useLocalizacao()` |
+| `components/BotoesReportar.tsx` | Cliente | Tem `onClick` e lê a contagem pelo `useAlertas()` |
+| `components/FormularioAlerta.tsx` | Cliente | Formulário com estado e `onSubmit` |
+| `components/ListaAlertas.tsx` | Cliente | Estado do filtro e leitura dos hooks |
+| `components/CardAlerta.tsx` | Cliente | Não tem `'use client'`, mas é importado pelo `ListaAlertas` |
+| `components/FormularioLocalizacao.tsx` | Cliente | Formulário com estado, `onSubmit` e botão do GPS |
+| `components/PlanoCartesiano.tsx` | Cliente | Desenha no `<canvas>` e usa `ResizeObserver` |
+| `components/Legenda.tsx` | Servidor | Não tem `'use client'` e é importado pela página do Plano, que é Server Component |
+| `hooks/*` e `lib/armazenamento.ts` | Cliente | Usados só pelos componentes de cliente |
+
+`lib/tipos.ts`, `lib/rotulos.ts`, `lib/distancia.ts` e `lib/formatar.ts` não dependem do navegador nem do servidor, então os dois lados usam. A fórmula de Haversine (`lib/distancia.ts`), por exemplo, roda no servidor na busca `?lat=&lon=` da API e no cliente na tela Ver Bairro.
+
+```mermaid
+flowchart LR
+  subgraph Servidor
+    JSON[("data/alertas.json")] --> LIB["lib/alertas-servidor.ts"]
+    LIB --> R1["GET /api/alertas"]
+    LIB --> R2["GET /api/alertas/:id"]
+    PAGES["layout.tsx, bairro, plano,<br/>como-funciona, Legenda"]
+  end
+
+  subgraph Navegador
+    AP["AlertasProvider"]
+    LP["LocalizacaoProvider"]
+    UI["Reportar, BottomNav, ListaAlertas,<br/>CardAlerta, formulários, PlanoCartesiano"]
+    LS[("localStorage")]
+    GPS(["GPS"])
+  end
+
+  PAGES -- "HTML inicial" --> UI
+  R1 -- "fetch('/api/alertas')" --> AP
+  AP <--> LS
+  LP <--> LS
+  GPS --> LP
+  AP --> UI
+  LP --> UI
+```
+
+### Rotas da aplicação
+
+**Páginas** (cada pasta com `page.tsx` dentro de `app/` vira uma URL):
+
+| URL | Arquivo | Tela | Antes (versão 2.0) |
+| --- | --- | --- | --- |
+| `/` | `app/page.tsx` | Reportar | `index.html` |
+| `/bairro` | `app/bairro/page.tsx` | Ver Bairro | `feed.html` |
+| `/plano` | `app/plano/page.tsx` | Plano cartesiano | `mapa.html` |
+| `/como-funciona` | `app/como-funciona/page.tsx` | Como Funciona | `como-funciona.html` |
+
+As quatro páginas usam o mesmo `app/layout.tsx`. A navegação entre elas é feita com `<Link>` do Next.js no `BottomNav`, que troca de tela sem recarregar a página. Assim os providers e os dados já carregados continuam na memória.
+
+**API** (cada pasta com `route.ts` dentro de `app/api/` vira um endpoint):
+
+| Método e URL | Arquivo | O que devolve |
+| --- | --- | --- |
+| `GET /api/alertas` | `app/api/alertas/route.ts` | Todos os alertas: `{ total, alertas }` |
+| `GET /api/alertas?tipo=agua` | `app/api/alertas/route.ts` | Só os do tipo `agua` ou `lixo` |
+| `GET /api/alertas?lat=…&lon=…&raio=…` | `app/api/alertas/route.ts` | Os que estão a até `raio` km (padrão 2), do mais perto ao mais longe |
+| `GET /api/alertas/:id` | `app/api/alertas/[id]/route.ts` | Um alerta, ou `404` |
+
+A pasta `[id]` entre colchetes é um **segmento dinâmico**: `/api/alertas/alert-3` chega na rota com `params.id = 'alert-3'`. Mais detalhes das respostas na seção [API](#api).
+
+```mermaid
+flowchart TB
+  APP["app/"] --> L["layout.tsx<br/>(moldura de todas as páginas)"]
+  APP --> P0["page.tsx → /"]
+  APP --> P1["bairro/page.tsx → /bairro"]
+  APP --> P2["plano/page.tsx → /plano"]
+  APP --> P3["como-funciona/page.tsx → /como-funciona"]
+  APP --> API["api/alertas/"]
+  API --> A0["route.ts → GET /api/alertas"]
+  API --> A1["[id]/route.ts → GET /api/alertas/:id"]
+```
+
+### Consumo do JSON pela API, com `fetch`
+
+Nenhum componente importa o `data/alertas.json`. O único arquivo que lê o JSON é `lib/alertas-servidor.ts`, no servidor. O navegador recebe os alertas pela API, com `fetch`, dentro do `AlertasProvider` (`context/AlertasProvider.tsx`):
+
+```tsx
+useEffect(() => {
+  const controle = new AbortController();
+
+  fetch('/api/alertas', { signal: controle.signal })
+    .then((resposta) => {
+      if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+      return resposta.json() as Promise<RespostaApi>;
+    })
+    .then((dados) => setDaApi(dados.alertas))
+    .catch((erro) => {
+      if (controle.signal.aborted) return;
+      console.error('Erro ao buscar alertas da API:', erro);
+      setErroApi('Não foi possível carregar os alertas da região. Mostrando só os seus.');
+    });
+
+  return () => controle.abort();
+}, []);
+```
+
+O caminho completo de um alerta de exemplo até a tela:
+
+1. O navegador abre qualquer página, e o `AlertasProvider` (que está no layout) roda o `fetch('/api/alertas')` uma vez.
+2. No servidor, `app/api/alertas/route.ts` chama `listarAlertas()` de `lib/alertas-servidor.ts`, que lê `data/alertas.json`, marca cada alerta com `origem: 'api'` e devolve `{ total, alertas }` com `NextResponse.json()`.
+3. No navegador, `resposta.json()` converte a resposta, e o provider junta esses alertas com os do `localStorage`.
+4. `ListaAlertas`, `BotoesReportar` e `PlanoCartesiano` leem a lista pronta com `useAlertas()`.
+
+Se a resposta não for `ok` ou a rede falhar, o `catch` grava uma mensagem que o `ListaAlertas` mostra na tela, e o app continua só com os alertas locais. O `AbortController` cancela a requisição se o provider for desmontado antes da resposta chegar.
+
+O app busca a lista inteira uma vez e filtra no navegador. Isso é necessário porque os alertas criados pelo usuário só existem no `localStorage` e também precisam entrar no filtro de 2 km. Os filtros `tipo`, `lat`, `lon`, `raio` e a rota `/:id` estão disponíveis para quem consumir a API diretamente. Exemplo no console do navegador:
+
+```js
+const resposta = await fetch('/api/alertas?lat=-23.5505&lon=-46.6333&raio=2');
+const { total, alertas } = await resposta.json();
+```
 
 ## API
 

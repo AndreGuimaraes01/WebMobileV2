@@ -1,0 +1,357 @@
+/**
+ * Radar Cidadão - estilos globais
+ * Tokens, reset, a moldura das telas e as classes usadas por mais de um componente.
+ * O resto fica no .module.css de cada componente.
+ */
+
+/* ===== RESET & VARIÁVEIS ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Cores */
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --success: #4caf50;
+  --warning: #ffaa00;
+  --danger: #ff4444;
+  --info: #00a8e1;
+
+  /* Tons neutros */
+  --bg-light: #f5f5f5;
+  --bg-white: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #ddd;
+
+  /* Espaçamento */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Tipografia */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+
+  /* Raio */
+  --border-radius: 8px;
+
+  /* Sombra */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== BODY & MOLDURA ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  background-color: var(--bg-light);
+  line-height: 1.6;
+}
+
+#app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 64px; /* espaço para a navegação fixa */
+}
+
+/* Faixa azul com o título, escrita em cada page.tsx */
+#app-container > header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+#app-container > header h1 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  flex: 1;
+}
+
+/* Área branca com o conteúdo da tela */
+section.view {
+  flex: 1;
+  padding: var(--spacing-lg);
+  padding-bottom: 100px;
+  background: var(--bg-white);
+  margin: var(--spacing-md);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Rodapé escuro (Como Funciona) */
+#app-container > footer {
+  background: var(--text-primary);
+  color: white;
+  text-align: center;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.page-intro {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ===== BOTÕES ===== */
+menu.action-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  list-style: none;
+}
+
+menu.action-buttons > li {
+  flex: 1;
+  display: flex;
+}
+
+.btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-height: 44px;
+  position: relative;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: var(--warning);
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #ff8800;
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== FORMULÁRIOS ===== */
+fieldset {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+legend {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+label {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+input[type='text'],
+input[type='number'],
+input[type='file'],
+textarea,
+select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  transition: border-color 0.3s;
+}
+
+input[type='text']:focus,
+input[type='number']:focus,
+input[type='file']:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ===== BADGES DE GRAVIDADE ===== */
+.badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--bg-light);
+  border-radius: 20px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.badge-urgent {
+  background: rgba(255, 68, 68, 0.2);
+  color: var(--danger);
+}
+
+.badge-warning {
+  background: rgba(255, 170, 0, 0.2);
+  color: var(--warning);
+}
+
+/* ===== MENSAGENS DE ERRO E SUCESSO ===== */
+.report-status {
+  display: block;
+}
+
+.report-status.ok,
+.report-status.erro {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  border-left: 4px solid;
+}
+
+.report-status.ok {
+  background: #d4edda;
+  color: #155724;
+  border-color: #28a745;
+}
+
+.report-status.erro {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #dc3545;
+}
+
+/* ===== TABLETS (768px) ===== */
+@media (max-width: 768px) {
+  #app-container > header {
+    padding: var(--spacing-md);
+  }
+
+  #app-container > header h1 {
+    font-size: var(--font-size-lg);
+  }
+
+  section.view {
+    padding: var(--spacing-md);
+    padding-bottom: 100px;
+    margin: var(--spacing-sm);
+  }
+
+  menu.action-buttons {
+    flex-direction: column;
+  }
+}
+
+/* ===== CELULARES (480px e abaixo) ===== */
+@media (max-width: 480px) {
+  :root {
+    --font-size-base: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 20px;
+    --spacing-lg: 16px;
+    --spacing-md: 12px;
+  }
+
+  html,
+  body {
+    font-size: 14px;
+  }
+
+  #app-container > header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #app-container > header h1 {
+    width: 100%;
+  }
+
+  section.view {
+    padding-bottom: 120px;
+    border-radius: 0;
+  }
+
+  menu.action-buttons {
+    gap: var(--spacing-sm);
+  }
+
+  .btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    min-height: 40px;
+  }
+
+  #app-container > footer {
+    padding: var(--spacing-sm);
+    font-size: 12px;
+  }
+}
+
+/* ===== ACESSIBILIDADE ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ===== IMPRESSÃO ===== */
+@media print {
+  section.view {
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+  }
+}

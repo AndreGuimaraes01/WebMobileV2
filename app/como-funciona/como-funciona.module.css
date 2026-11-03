@@ -1,0 +1,135 @@
+.cartao {
+  background: var(--bg-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  border-left: 4px solid var(--primary);
+}
+
+.cartao h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-sm);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.intro {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: 20px;
+}
+
+/* ===== PASSO A PASSO ===== */
+.passos h3 {
+  margin-bottom: 8px;
+}
+
+.passos ol {
+  list-style: none;
+  counter-reset: passo;
+}
+
+.passos li {
+  position: relative;
+  padding-left: 48px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.passos li::before {
+  counter-increment: passo;
+  content: counter(passo);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.passos h4 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-xs);
+}
+
+.passos li p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ===== CATEGORIAS ===== */
+.categorias {
+  border-left-color: var(--warning);
+  margin-top: 24px;
+}
+
+.categorias .intro {
+  margin-bottom: 12px;
+}
+
+.selos {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.selos li {
+  background: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+
+/* ===== PERGUNTAS FREQUENTES ===== */
+.faq {
+  margin-top: var(--spacing-xl);
+}
+
+.faq h3 {
+  margin-bottom: 16px;
+}
+
+.faq details {
+  background: var(--bg-light);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+}
+
+.faq summary {
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  padding: 4px 0;
+}
+
+.faq details p {
+  margin-top: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+/* ===== INFORMAÇÕES DO PROJETO ===== */
+.tecnico {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+}

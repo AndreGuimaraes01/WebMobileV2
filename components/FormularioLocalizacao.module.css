@@ -1,0 +1,53 @@
+.painel {
+  background: var(--bg-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  border-left: 4px solid var(--info);
+}
+
+.painel h3 {
+  margin-bottom: var(--spacing-md);
+  color: var(--info);
+  font-size: var(--font-size-lg);
+}
+
+.linha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.status {
+  display: block;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: white;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+}
+
+.manual {
+  border-left: 3px solid var(--warning);
+}
+
+.gps {
+  border-left: 3px solid var(--success);
+}
+
+@media (max-width: 768px) {
+  .linha {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .painel {
+    padding: var(--spacing-md);
+  }
+
+  .painel h3 {
+    font-size: var(--font-size-base);
+  }
+}

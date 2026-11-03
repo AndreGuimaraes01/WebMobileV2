@@ -1,0 +1,31 @@
+.legenda {
+  list-style: none;
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  font-size: 13px;
+}
+
+.legenda li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ponto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.voce {
+  border: 2px solid white;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+@media (max-width: 768px) {
+  .legenda {
+    grid-template-columns: 1fr 1fr;
+  }
+}

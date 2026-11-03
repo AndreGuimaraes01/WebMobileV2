@@ -1,0 +1,62 @@
+[
+  {
+    "id": "alert-1",
+    "type": "agua",
+    "title": "Alagamento",
+    "description": "Via parcialmente alagada",
+    "latitude": -23.5515,
+    "longitude": -46.633,
+    "severity": "urgent",
+    "timestamp": 1793047200000
+  },
+  {
+    "id": "alert-2",
+    "type": "lixo",
+    "title": "Acúmulo de Lixo",
+    "description": "Lixo acumulado na esquina",
+    "latitude": -23.552,
+    "longitude": -46.634,
+    "severity": "moderate",
+    "timestamp": 1793050800000
+  },
+  {
+    "id": "alert-3",
+    "type": "agua",
+    "title": "Alagamento",
+    "description": "Poça grande perto do ponto de ônibus",
+    "latitude": -23.548,
+    "longitude": -46.638,
+    "severity": "low",
+    "timestamp": 1793133600000
+  },
+  {
+    "id": "alert-4",
+    "type": "lixo",
+    "title": "Acúmulo de Lixo",
+    "description": "Entulho bloqueando a calçada",
+    "latitude": -23.556,
+    "longitude": -46.629,
+    "severity": "urgent",
+    "timestamp": 1793140800000
+  },
+  {
+    "id": "alert-5",
+    "type": "agua",
+    "title": "Alagamento",
+    "description": "Bueiro entupido, água subindo na sarjeta",
+    "latitude": -23.545,
+    "longitude": -46.625,
+    "severity": "moderate",
+    "timestamp": 1793216400000
+  },
+  {
+    "id": "alert-6",
+    "type": "lixo",
+    "title": "Acúmulo de Lixo",
+    "description": "Sacos de lixo fora do horário da coleta",
+    "latitude": -23.57,
+    "longitude": -46.645,
+    "severity": "low",
+    "timestamp": 1793224800000
+  }
+]

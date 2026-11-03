@@ -1,0 +1,10 @@
+.formulario {
+  background: var(--bg-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+}
+
+.formulario menu {
+  margin-bottom: 0;
+}

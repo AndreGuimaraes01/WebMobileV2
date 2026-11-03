@@ -1,0 +1,13 @@
+.mapa {
+  background: var(--bg-white);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 480px) {
+  .mapa {
+    padding: var(--spacing-md);
+  }
+}
