@@ -8,6 +8,8 @@ import type { Alerta, Localizacao } from '@/lib/tipos';
 import styles from './PlanoCartesiano.module.css';
 
 const MARGEM = 60;
+// À esquerda cabem os números da latitude e o nome do eixo, lado a lado
+const MARGEM_ESQUERDA = 80;
 const ALCANCE = 0.02; // graus para cada lado do usuário (~2 km)
 const DIVISOES = 4;
 
@@ -25,10 +27,10 @@ function estaNaArea(alerta: Alerta, centro: Localizacao) {
 
 // Converte latitude/longitude em x/y do canvas
 function paraPixel(lat: number, lon: number, centro: Localizacao, { largura, altura }: Area) {
-  const w = largura - 2 * MARGEM;
+  const w = largura - MARGEM_ESQUERDA - MARGEM;
   const h = altura - 2 * MARGEM;
   return {
-    x: MARGEM + ((lon - (centro.longitude - ALCANCE)) / (2 * ALCANCE)) * w,
+    x: MARGEM_ESQUERDA + ((lon - (centro.longitude - ALCANCE)) / (2 * ALCANCE)) * w,
     y: MARGEM + ((centro.latitude + ALCANCE - lat) / (2 * ALCANCE)) * h,
   };
 }
@@ -47,10 +49,13 @@ function desenharPonto(ctx: CanvasRenderingContext2D, x: number, y: number, raio
 // Grade, eixos e números das coordenadas
 function desenharGrade(ctx: CanvasRenderingContext2D, centro: Localizacao, { largura: W, altura: H }: Area) {
   const p = MARGEM;
+  const e = MARGEM_ESQUERDA;
+  // Em tela estreita os números da longitude se encostam; aí só metade aparece
+  const pularLongitudes = (W - e - p) / DIVISOES < 56;
   ctx.font = '11px sans-serif';
 
   for (let i = 0; i <= DIVISOES; i++) {
-    const x = p + (i * (W - 2 * p)) / DIVISOES;
+    const x = e + (i * (W - e - p)) / DIVISOES;
     const y = p + (i * (H - 2 * p)) / DIVISOES;
 
     ctx.strokeStyle = '#e8e8e8';
@@ -58,7 +63,7 @@ function desenharGrade(ctx: CanvasRenderingContext2D, centro: Localizacao, { lar
     ctx.beginPath();
     ctx.moveTo(x, p);
     ctx.lineTo(x, H - p);
-    ctx.moveTo(p, y);
+    ctx.moveTo(e, y);
     ctx.lineTo(W - p, y);
     ctx.stroke();
 
@@ -66,17 +71,17 @@ function desenharGrade(ctx: CanvasRenderingContext2D, centro: Localizacao, { lar
     const lat = centro.latitude + ALCANCE - (i * 2 * ALCANCE) / DIVISOES;
     ctx.fillStyle = '#666';
     ctx.textAlign = 'center';
-    ctx.fillText(lon.toFixed(4), x, H - p + 18);
+    if (!pularLongitudes || i % 2 === 0) ctx.fillText(lon.toFixed(4), x, H - p + 18);
     ctx.textAlign = 'right';
-    ctx.fillText(lat.toFixed(4), p - 6, y + 4);
+    ctx.fillText(lat.toFixed(4), e - 6, y + 4);
   }
 
   // Eixos X e Y
   ctx.strokeStyle = '#333';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(p, p);
-  ctx.lineTo(p, H - p);
+  ctx.moveTo(e, p);
+  ctx.lineTo(e, H - p);
   ctx.lineTo(W - p, H - p);
   ctx.stroke();
 
@@ -84,7 +89,7 @@ function desenharGrade(ctx: CanvasRenderingContext2D, centro: Localizacao, { lar
   ctx.fillStyle = '#333';
   ctx.font = 'bold 12px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Longitude (Oeste → Leste)', W / 2, H - 12);
+  ctx.fillText('Longitude (Oeste → Leste)', (e + W - p) / 2, H - 12);
 
   ctx.save();
   ctx.translate(14, H / 2);
