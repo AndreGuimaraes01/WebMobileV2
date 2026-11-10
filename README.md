@@ -326,7 +326,7 @@ Esta tela é um Server Component sem estado, e os estilos do `<style>` e dos atr
 O servidor do Next.js faz três coisas:
 
 1. **Monta o HTML das telas.** Toda página sai do servidor já com o cabeçalho, a navegação e os textos fixos. As telas sem estado (Como Funciona, por exemplo) são montadas inteiras lá.
-2. **Serve a API de alertas.** As rotas em `app/api/alertas/` leem `data/alertas.json` (por meio de `lib/alertas-servidor.ts`) e respondem em JSON. O filtro por tipo, o cálculo de distância e a ordenação da busca por proximidade também acontecem no servidor.
+2. **Serve a API de alertas.** As rotas em `app/api/alertas/` leem `data/alertas.json` (por meio de `lib/alertas-servidor.ts`) e respondem em JSON. O arquivo é lido com `fs` a cada requisição, e não importado, então o app não depende dele para compilar. O filtro por tipo, o cálculo de distância e a ordenação da busca por proximidade também acontecem no servidor.
 3. **Guarda o JSON longe do navegador.** `lib/alertas-servidor.ts` começa com `import 'server-only'`, então o build falha se algum componente do cliente tentar importar o arquivo. O navegador só chega aos dados pela API.
 
 O que o servidor **não** faz:
@@ -459,6 +459,8 @@ O caminho completo de um alerta de exemplo até a tela:
 
 Se a resposta não for `ok` ou a rede falhar, o `catch` grava uma mensagem que o `ListaAlertas` mostra na tela, e o app continua só com os alertas locais. O `AbortController` cancela a requisição se o provider for desmontado antes da resposta chegar.
 
+**E se o JSON for apagado?** O app continua funcionando. `lib/alertas-servidor.ts` lê o arquivo dentro de um `try/catch`: se ele não existir ou estiver inválido, a API responde `200` com `{ "total": 0, "alertas": [] }` e registra um aviso no terminal do servidor. As quatro telas abrem normalmente, e dá para criar e ver os alertas locais. Só os alertas de exemplo somem. Um item com campo faltando ou de tipo errado é ignorado, sem derrubar os outros.
+
 O app busca a lista inteira uma vez e filtra no navegador. Isso é necessário porque os alertas criados pelo usuário só existem no `localStorage` e também precisam entrar no filtro de 2 km. Os filtros `tipo`, `lat`, `lon`, `raio` e a rota `/:id` estão disponíveis para quem consumir a API diretamente. Exemplo no console do navegador:
 
 ```js
@@ -504,6 +506,7 @@ As respostas da API ainda trazem `"origem": "api"` e, quando a busca usa `lat` e
 - Se não houver localização salva, o app tenta o GPS uma vez ao abrir.
 - A distância entre você e cada alerta é calculada com a fórmula de Haversine.
 - Se a API não responder, o app continua funcionando só com os alertas locais.
+- Se o `data/alertas.json` for apagado ou estiver inválido, a API devolve uma lista vazia e o app também continua funcionando só com os alertas locais.
 
 ## Deploy
 

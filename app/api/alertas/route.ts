@@ -14,7 +14,7 @@ function paraNumero(texto: string | null): number {
 }
 
 // GET /api/alertas?tipo=agua&lat=-23.55&lon=-46.63&raio=2
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const busca = request.nextUrl.searchParams;
   const tipo = busca.get('tipo');
   const lat = busca.get('lat');
@@ -48,6 +48,6 @@ export function GET(request: NextRequest) {
     filtro.perto = { latitude, longitude, raioKm };
   }
 
-  const alertas = listarAlertas(filtro);
+  const alertas = await listarAlertas(filtro);
   return NextResponse.json({ total: alertas.length, alertas });
 }
